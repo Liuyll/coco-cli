@@ -1,0 +1,20 @@
+{
+  "name": "coco-cli",
+  "version": "1.0.0",
+  "description": "easy react-cli",
+  "bin": {
+    "coco": "./bin/init.js"
+  },
+  "main": "index.js",
+  "author": "Liuyl",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "commander": "^4.1.1",
+    "download-git-repo": "^3.0.2",
+    "ejs": "^3.0.1",
+    "glob": "^7.1.6",
+    "inquirer": "^7.0.4",
+    "metalsmith": "^2.3.0"
+  }
+}
