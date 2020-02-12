@@ -16,5 +16,8 @@
     "glob": "^7.1.6",
     "inquirer": "^7.0.4",
     "metalsmith": "^2.3.0"
+  },
+  "devDependencies": {
+    "ora": "^4.0.3"
   }
 }

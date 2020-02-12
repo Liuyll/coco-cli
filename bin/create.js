@@ -6,18 +6,20 @@ const path = require('path')
 const colors = require('colors')
 const inquirer = require('inquirer')
 const rm = require('rimraf').sync
+const ora = require('ora')
 
 const pullTemplate = require('../lib/download')
 const handleTemplate = require('../lib/handle')
 
-function computedRootName(projectName) {
-    let rootName
+const NOOP = () => {}
+function computedRootFolder(projectName) {
+    let rootFolder
 
     const curList = glob.sync('*')
     const curFolderName = path.basename(process.cwd())
     // console.log(curName,curList)
     if(!curList.length && curFolderName == projectName) {
-        rootName = '.'
+        rootFolder = '.'
     } else {
         if(!curList.includes(projectName)) mkdirAndSetRoot()
         else {
@@ -36,14 +38,14 @@ function computedRootName(projectName) {
             console.log(colors.red(`${err}`))
         } 
       
-        rootName = `./${projectName}`
+        rootFolder = `./${projectName}`
     }
 
-    return rootName
+    return rootFolder
 }
 
 // utilize pull Template IO to do something
-function waitingPullDoWhat() {
+function waitingPullDoWhat(cb = NOOP) {
     return inquirer.prompt([
         {
             type: 'confirm',
@@ -71,7 +73,10 @@ function waitingPullDoWhat() {
             default: 'LESS',
             when: (answer) => (!answer.isDefault)
         }
-    ])
+    ]).then((config) => {
+        cb()
+        return config
+    })
 }
 
 const DefaultOptions = {
@@ -80,15 +85,22 @@ const DefaultOptions = {
 }
 
 module.exports = function main(projectName) {
-    const rootName = computedRootName(projectName)
-    if(!rootName) return 
+    const rootFolder = computedRootFolder(projectName)
+    if(!rootFolder) return 
+
+    const spinner = ora(colors.bold.yellow(`pulling template from git,waiting ...`))
 
     Promise.all([
-        pullTemplate(`./${rootName}/temp`),
-        waitingPullDoWhat()
+        pullTemplate(`./${rootFolder}/temp`),
+        waitingPullDoWhat(() => spinner.start())
     ])
         .then(([result,config]) => {
-            if(!result) return
+            if(!result) {
+                spinner.fail()
+                return
+            }
+            
+            spinner.succeed()
 
             const { templateTarget } = result
             if(config.isDefault) {
@@ -98,11 +110,39 @@ module.exports = function main(projectName) {
                 })
             }
 
-            const tempModifyFolder = `${rootName}/_temp`
+            const tempModifyFolder = `${rootFolder}/_temp`
             handleTemplate(tempModifyFolder,templateTarget,config)
                 .then(() => {
-                    child_process.exec(`cp -r ${tempModifyFolder}/* ${rootName}`,() => rm(tempModifyFolder))
+                        return new Promise((resolve) => child_process.exec(`cp -a ${tempModifyFolder}/. ${rootFolder}`,() => {
+                            rm(tempModifyFolder)
+                            resolve()
+                        })
+                    )
+                })
+                .then(() => {
+                    handleCustom(rootFolder,config)
+                })
+                .then(() => {
+                    console.log(colors.green.bold(`success!
+project: ${projectName} has created;
+
+please follow step:
+1.${rootFolder == '.' ? 'yarn install' : 'cd '+ rootFolder.slice(2) +' && yarn install'}
+2.yarn run dev
+                    `))
                 })
         })
 
+}
+
+function handleCustom(rootFolder,config) {
+    if(config.isJs) {
+        fs.unlinkSync(path.resolve(rootFolder,'.eslintrc-ts.yml'))
+        fs.renameSync(path.resolve(rootFolder,'.eslintrc-js.yml'),path.resolve(rootFolder,'.eslintrc.yml'))
+    } else {
+        fs.unlinkSync(path.resolve(rootFolder,'.eslintrc-js.yml'))
+        fs.renameSync(path.resolve(rootFolder,'.eslintrc-ts.yml'),path.resolve(rootFolder,'.eslintrc.yml'))
+
+        fs.unlinkSync(path.resolve(rootFolder,'tsconfig.json'))
+    }
 }
