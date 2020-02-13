@@ -1,6 +1,6 @@
 {
   "name": "limbo-coco-cli",
-  "version": "1.2.0",
+  "version": "1.1.0",
   "description": "easy react-cli",
   "repository": "https://github.com/Liuyll/coco-cli",
   "bin": {
