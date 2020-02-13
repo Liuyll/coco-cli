@@ -24,8 +24,7 @@ function computedRootFolder(projectName) {
         if(!curList.includes(projectName)) mkdirAndSetRoot()
         else {
             if(fs.statSync(`./${projectName}`).isDirectory()) {
-                console.log(colors.red(`Error: `))
-                console.log(colors.red(`Project: ${projectName} has existed`))
+                console.log(colors.bold.red(`Err! Project: ${projectName} has existed`))
             } else mkdirAndSetRoot()
         }
     }
@@ -34,8 +33,8 @@ function computedRootFolder(projectName) {
         try {
             fs.mkdirSync(`./${projectName}`)
         } catch(err) {
-            console.log(colors.red(`Create project: ${projectName} folder occur a error: ${err}`))
-            console.log(colors.red(`${err}`))
+            console.log(colors.bold.red(`Create project: ${projectName} folder occur a error: 
+            ${err}`))
         } 
       
         rootFolder = `./${projectName}`
@@ -97,7 +96,8 @@ module.exports = function main(projectName) {
         .then(([result,config]) => {
             if(!result) {
                 spinner.fail()
-                return
+                // 退出
+                process.exit(1)
             }
             
             spinner.succeed()
@@ -117,7 +117,7 @@ module.exports = function main(projectName) {
                             rm(tempModifyFolder)
                             resolve()
                         })
-                    )
+                     )
                 })
                 .then(() => {
                     handleCustom(rootFolder,config)
@@ -139,10 +139,12 @@ function handleCustom(rootFolder,config) {
     if(config.isJs) {
         fs.unlinkSync(path.resolve(rootFolder,'.eslintrc-ts.yml'))
         fs.renameSync(path.resolve(rootFolder,'.eslintrc-js.yml'),path.resolve(rootFolder,'.eslintrc.yml'))
+
+        // remove tsconfig.json in js mode
+        fs.unlinkSync(path.resolve(rootFolder,'tsconfig.json'))
     } else {
         fs.unlinkSync(path.resolve(rootFolder,'.eslintrc-js.yml'))
         fs.renameSync(path.resolve(rootFolder,'.eslintrc-ts.yml'),path.resolve(rootFolder,'.eslintrc.yml'))
-
-        fs.unlinkSync(path.resolve(rootFolder,'tsconfig.json'))
-    }
+       
+    } 
 }
