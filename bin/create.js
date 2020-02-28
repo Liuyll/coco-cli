@@ -71,6 +71,13 @@ function waitingPullDoWhat(cb = NOOP) {
             ],
             default: 'LESS',
             when: (answer) => (!answer.isDefault)
+        },
+        {
+            type: 'confirm',
+            name: 'isStructure',
+            message: 'whether to create default project structure?',
+            default: false,
+            when: (answer) => (!answer.isDefault)
         }
     ]).then((config) => {
         cb()
@@ -80,7 +87,8 @@ function waitingPullDoWhat(cb = NOOP) {
 
 const DefaultOptions = {
     isJs: false,
-    preCss: 'LESS'
+    preCss: 'LESS',
+    isStructure: false
 }
 
 module.exports = function main(projectName) {
@@ -144,7 +152,7 @@ function handleCustom(rootFolder,config) {
         fs.unlinkSync(path.resolve(rootFolder,'tsconfig.json'))
     } else {
         fs.unlinkSync(path.resolve(rootFolder,'.eslintrc-js.yml'))
-        fs.renameSync(path.resolve(rootFolder,'.eslintrc-ts.yml'),path.resolve(rootFolder,'.eslintrc.yml'))
-       
+        fs.renameSync(path.resolve(rootFolder,'.eslintrc-ts.yml'),path.resolve(rootFolder,'.eslintrc.yml'))    
     } 
 }
+

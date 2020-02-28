@@ -858,9 +858,9 @@ klaw@^1.0.0:
     graceful-fs "^4.1.9"
 
 limbo-coco-cli@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npm.taobao.org/limbo-coco-cli/download/limbo-coco-cli-1.0.0.tgz?cache=0&sync_timestamp=1581527075967&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Flimbo-coco-cli%2Fdownload%2Flimbo-coco-cli-1.0.0.tgz#9bc532ce49992602572d3ff0b71991106a9f4de4"
-  integrity sha1-m8UyzkmZJgJXLT/wtxmREGqfTeQ=
+  version "1.1.0"
+  resolved "https://registry.npm.taobao.org/limbo-coco-cli/download/limbo-coco-cli-1.1.0.tgz#5ddd943a0e70798b1810441a8f373cb797220b32"
+  integrity sha1-Xd2UOg5weYsYEEQajzc8t5ciCzI=
   dependencies:
     colors "^1.4.0"
     commander "^4.1.1"
