@@ -11,4 +11,5 @@ program
 program
     .usage(colors.blue.bold('create <projectName>'))
 
+program.version('1.2.0')
 program.parse(process.argv)
